@@ -4,7 +4,8 @@
  By: Elbert Dang
  Date: 9/21/2014
  
- Usage: Run using Processing 2.x
+ Usage: Run using Processing 2.x with ControlP5 library
+         -Load images into the data/img folder
  System: JVM 
  
  Description: Mode 0: Display images in carousel fashion
@@ -15,13 +16,13 @@
                  -Navigate images with LEFT and RIGHT arrow keys
                  -Press DOWN or click image to go back to Mode 0
                  -Type text into textbox to edit image tags
- 1.5 update - Add animated transitions and mouseclick to open
- 2.5 update - Add sounds for screen transitions
-            - Add tags in Fullscreen mode
+1.5 update - Add animated transitions and mouseclick to open
+2.5 update - Add sounds for screen transitions
+           - Add tags in Fullscreen mode
  
  *************************************************/
 
-
+String[] list;
 int selectedImage = 0; // Initial image to be displayed is the first
 int leftmost = 0;
 boolean fullscreenMode = false; //Starts in thumbnail view
@@ -34,7 +35,9 @@ float fullHeight = 600;
 float windowHeight = fullHeight/4; //Tall, skinny images gets scaled down to 150
 float border = 50;
 float toAnimate = 0;
-int[] currentDisplay = { 0, 1, 2, 3, 4};
+int[] currentDisplay = { 
+  0, 1, 2, 3, 4
+};
 boolean right = true;
 
 // Declaring an array of images.
@@ -48,17 +51,23 @@ AudioPlayer longSound;
 AudioPlayer shortSound;
 
 //Textfield for tags
-import java.awt.*;
-TextField tagTextField = new TextField("", 10);
+//import java.awt.*; //Not recommended
+//TextField tagTextField = new TextField("", 10);
+import controlP5.*;
+ControlP5 cp5;
+Textfield tagInputField;
+Button tagSaveButton;
+String[] tagList;
+String tagInput="";
 
 void setup() {
   size((int)fullWidth, (int)fullHeight);
-
+  //add(tagTextField); //awt
+  cp5 = new ControlP5(this);
   // Loading the images into the array
   //From http://processing.org/discourse/beta/num_1253083238.html and http://processing.org/discourse/beta/num_1247100666.html
   File dir = new File(sketchPath +"/data/img/");
-  String[] list = dir.list();
-
+  list = dir.list();
   //Make imagelist the capable of holding all files in data
   imageList = new PImage[list.length];
 
@@ -76,23 +85,36 @@ void setup() {
       }
     }
   }
-  // println(imageList.length);
-  
+
   //Load sounds
   minim = new Minim(this);
   longSound = minim.loadFile("aud/long.wav");
   shortSound = minim.loadFile("aud/short.mp3");
-  
-  //Lets textfield listen to key presses
-  tagTextField.addKeyListener(this);
-}
 
+  //Lets textfield listen to key presses
+  //tagTextField.addKeyListener(this);
+  tagInputField = cp5.addTextfield("tagInput")
+    .setPosition((width / 2)-60, (border/4))
+      .setSize(100, 20)
+        .setVisible(false)
+          .setCaptionLabel("Press Return to add tag")
+            .setFocus(true);
+  tagSaveButton = cp5.addButton("saveButton")
+    .setPosition((width / 2)+50, (border/4))
+      .setSize(70, 20)
+        .setVisible(false)
+          .setCaptionLabel("Save Tags");
+  loadTags();
+}
 
 void draw() {
   background(#6A0E0E); //maroon background
   if (fullscreenMode) {
+    //tagTextField.setVisible(true);
     displayFullscreen();
   } else {
+
+    //tagTextField.setVisible(false);
     thumbRatio=windowWidth/windowHeight;
     displayThumbnails();
   }
@@ -104,46 +126,48 @@ void displayFullscreen() {
     offset = -1;
   } else if (toAnimate<0) { //if shifting left
     offset = 1;
-  }else{
+  } else {
     offset = 0;
   }
-    //Render Selected image;
-    resizeImage(imageList[selectedImage]);
-    imageMode(CENTER);
-    image(imageList[selectedImage], fullWidth*(toAnimate/100)+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
-    rectMode(CENTER);
-    stroke(#5755BC);
-    strokeWeight(border);
-    //Transparent rectangle
-    noFill();
-    //http://processing.org/reference/rect_.html
-    rect((fullWidth*(toAnimate/100))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
-    
-    //Render next image    
-    int nextImg = selectedImage+offset;
-    if (nextImg > imageList.length-1) {
-      nextImg = 0; //Loops to beginning if reached the end
-    } else if (nextImg < 0) {
-      nextImg = imageList.length-1; //Loops to end if reached the beginning 
-    }
-    resizeImage(imageList[nextImg]);
-    imageMode(CENTER);
-    image(imageList[nextImg], (fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
-    rectMode(CENTER);
-    stroke(#5755BC); //Light blue border
-    strokeWeight(border);
-    //Transparent rectangle
-    noFill();
-    //http://processing.org/reference/rect_.html
-    rect((fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
+  //Render Selected image;
+  resizeImage(imageList[selectedImage]);
+  imageMode(CENTER);
+  image(imageList[selectedImage], fullWidth*(toAnimate/100)+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
+  rectMode(CENTER);
+  stroke(#5755BC);
+  strokeWeight(border);
+  //Transparent rectangle
+  noFill();
+  //http://processing.org/reference/rect_.html
+  rect((fullWidth*(toAnimate/100))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
+
+  //Render next image    
+  int nextImg = selectedImage+offset;
+  if (nextImg > imageList.length-1) {
+    nextImg = 0; //Loops to beginning if reached the end
+  } else if (nextImg < 0) {
+    nextImg = imageList.length-1; //Loops to end if reached the beginning
+  }
+  resizeImage(imageList[nextImg]);
+  imageMode(CENTER);
+  image(imageList[nextImg], (fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
+  rectMode(CENTER);
+  stroke(#5755BC); //Light blue border
+  strokeWeight(border);
+  //Transparent rectangle
+  noFill();
+  //http://processing.org/reference/rect_.html
+  rect((fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
 
   if (toAnimate>0) {
     toAnimate-=5;
   } else if (toAnimate<0) {
     toAnimate+=5;
+  } else {
+    //last so it appears on top of image and border
+    //Only appears when images are not moving
+    displayTags();
   }
-  //last so it appears on top
-  displayTags();
 }
 void displayThumbnails() {  
   int[] display = new int[5];
@@ -244,7 +268,7 @@ void shiftLeft() {
   if (leftmost < 0) {
     leftmost = imageList.length+leftmost;
   }
-  //displayThumbnails();  
+  //displayThumbnails();
 }
 void shiftRight() {
   longSound.rewind();
@@ -265,6 +289,10 @@ void keyPressed() {
       if (fullscreenMode) {
         shortSound.rewind();
         shortSound.play();
+
+        tagInputField.setVisible(false);
+        tagSaveButton.setVisible(false);        
+        tagSaveButton.setCaptionLabel("Save Tags");
         toAnimate = -100; 
         if (0 > selectedImage) {
           selectedImage=imageList.length-1;
@@ -286,6 +314,10 @@ void keyPressed() {
       if (fullscreenMode) {
         shortSound.rewind();
         shortSound.play();
+
+        tagInputField.setVisible(false);
+        tagSaveButton.setVisible(false);
+        tagSaveButton.setCaptionLabel("Save Tags");
         toAnimate = 100; 
         if (selectedImage>imageList.length-1) {
           selectedImage=0;
@@ -305,10 +337,13 @@ void keyPressed() {
       shortSound.rewind();
       shortSound.play();
       fullscreenMode = true;
-      toAnimate=0;      
+      toAnimate=0;
     } else if ((keyCode == DOWN)  && fullscreenMode) {//Does nothing if not in fullscreenMode{
       shortSound.rewind();
       shortSound.play();
+      tagInputField.setVisible(false);
+      tagSaveButton.setVisible(false);
+      tagSaveButton.setCaptionLabel("Save Tags");
       fullscreenMode = false; //Centers selected image
       if (selectedImage==0) { 
         leftmost = imageList.length-2;
@@ -316,23 +351,16 @@ void keyPressed() {
         leftmost = imageList.length-1;
       } else {
         leftmost = selectedImage-2;
-      }      
+      }
     }
   } else if ((key == '>') && !fullscreenMode) {//Does nothing if in fullscreenMode
-      shiftRight();
-      selectedImage=leftmost; 
-      displayThumbnails();
+    shiftRight();
+    selectedImage=leftmost; 
+    displayThumbnails();
   } else if ((key == '<') && !fullscreenMode) {//Does nothing if in fullscreenMode
-      shiftLeft();
-      selectedImage=leftmost; 
-      displayThumbnails();    
-  }else if ((key == RETURN||key == ENTER)&&fullscreenMode) {
-    //textField.setFocusable(false);
-//       s = textField.getText();
-//       println("textfield: "+textField.getText());
-//       println("parsed text: "+s);
-//       redraw();
-//    
+    shiftLeft();
+    selectedImage=leftmost; 
+    displayThumbnails();
   }
 } 
 
@@ -390,22 +418,78 @@ void mouseClicked() {
       shortSound.play();
       fullscreenMode = true;
     }
-  } else {//Already in fullscreenMode
-    shortSound.rewind();
-    shortSound.play();
-    fullscreenMode = false; //Switch back to thumbnail view with selected image in center
-    if (selectedImage==0) {
-      leftmost = imageList.length-2;
-    } else if (selectedImage==1) {
-      leftmost = imageList.length-1;
+  }
+}
+
+void displayTags() {
+  tagInputField.setVisible(true);
+  tagInputField.setFocus(true);
+  tagSaveButton.setVisible(true);
+
+  //  println("thumbWidth: "+thumbWidth);
+  //  println("thumbHeight: "+thumbHeight);
+
+  textSize(25);
+  textAlign(CENTER);
+
+  //Black Outline
+  fill(#000000);
+  text(tagList[selectedImage], (fullWidth/2)-1, (fullHeight)-(border/4)-1, fullWidth, border);
+  text(tagList[selectedImage], (fullWidth/2)+1, (fullHeight)-(border/4)+1, fullWidth, border);
+
+  //White text
+  fill(#FFFFFF);
+  text(tagList[selectedImage], (fullWidth/2), (fullHeight)-(border/4), fullWidth, border);
+}
+
+void loadTags() {
+  BufferedReader reader;
+  tagList = new String[imageList.length];
+
+  for (int i = 0; i<tagList.length; i++) {
+    //Checks to see if file exists
+    File f = new File(dataPath("/tag/" + list[i]+"_tag.txt"));
+    if (f.exists())
+    {
+      try {
+        //If it exists, readline from the file 
+        reader = createReader(dataPath("/tag/" + list[i]+"_tag.txt"));
+        tagList[i]=reader.readLine();
+      } 
+      catch (IOException e) {
+        e.printStackTrace();
+      }
     } else {
-      leftmost = selectedImage-2;
+      tagList[i]="No tags";
     }
   }
 }
 
-void displayTags(){
-  textSize(32);
-  textAlign(CENTER);
-  text("test", fullWidth/2, fullHeight-(border/4));
+void saveTags() {
+  PrintWriter output;
+  for (int i = 0; i<tagList.length; i++) {
+    if (!tagList[i].equals("No tags")) {
+      output = createWriter(dataPath("/tag/" + list[i]+"_tag.txt"));
+      output.print(tagList[i]);
+      tagSaveButton.setCaptionLabel("Tags saved OK!");
+      output.flush(); // Writes the remaining data to the file
+      output.close(); // Finishes the file
+    }
+  }
 }
+
+//Listens for control input
+void controlEvent(ControlEvent theEvent) {
+  //From http://www.kasperkamperman.com/blog/processing-code/controlp5-library-example1/comment-page-1/
+  if (theEvent.controller().name()=="tagInput") {    
+    tagSaveButton.setCaptionLabel("Save Tags");
+    if (tagList[selectedImage].equals("No tags")) {
+      tagList[selectedImage]="#"+tagInput;
+    } else {
+      tagList[selectedImage]+=" #"+tagInput;
+    }
+  } else if (theEvent.controller().name()=="saveButton") {
+    saveTags();
+  }
+}
+

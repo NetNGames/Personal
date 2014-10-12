@@ -8,7 +8,7 @@
  System: JVM 
  
  Description: Mode 0: Display images in carousel fashion
- Mode 1: Display images full screen
+              Mode 1: Display images full screen
  1.5 update - Add animated transitions and mouseclick to open
  
  *************************************************/
@@ -26,9 +26,7 @@ float fullHeight = 600;
 float windowHeight = fullHeight/4; //Tall, skinny images gets scaled down to 150
 float border = 50;
 float toAnimate = 0;
-int[] currentDisplay = {
-  0, 1, 2, 3, 4
-};
+int[] currentDisplay = {0, 1, 2, 3, 4};
 boolean right = true;
 
 // Declaring an array of images.
@@ -51,15 +49,14 @@ void setup() {
     int j=0;
     for (int i=0; i < list.length; i ++ ) { //Loops through data list
       if (list[i].endsWith("png")||  //Loads into image array if it's a picture
-      list[i].endsWith("jpg")||
-        list[i].endsWith("gif")||
-        list[i].endsWith("bmp")) {
+          list[i].endsWith("jpg")||
+          list[i].endsWith("gif")||
+          list[i].endsWith("bmp")) {
         imageList[j] = loadImage( list[i] );
         j++;
       }
     }
   }
-  // println(imageList.length);
 }
 
 
@@ -79,38 +76,38 @@ void displayFullscreen() {
     offset = -1;
   } else if (toAnimate<0) { //if shifting left
     offset = 1;
-  }else{
+  } else {
     offset = 0;
   }
-    
-    int oriImg = selectedImage+offset;//Original image
-    if (oriImg > imageList.length-1) {
-      oriImg = 0;
-    } else if (oriImg < 0) {
-      oriImg = imageList.length-1;
-    }
-    resizeImage(imageList[oriImg]);
-    imageMode(CENTER);
-    image(imageList[oriImg], (fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
-    rectMode(CENTER);
-    stroke(#000000); //black border
-    strokeWeight(border);
-    //Transparent rectangle
-    noFill();
-    //http://processing.org/reference/rect_.html
-    rect((fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
 
-    resizeImage(imageList[selectedImage]);//Next, selected image
-    imageMode(CENTER);
-    image(imageList[selectedImage], fullWidth*(toAnimate/100)+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
-    rectMode(CENTER);
-    stroke(#000000); //black border
-    strokeWeight(border);
-    //Transparent rectangle
-    noFill();
-    //http://processing.org/reference/rect_.html
-    rect((fullWidth*(toAnimate/100))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
-    
+  int oriImg = selectedImage+offset;//Original image
+  if (oriImg > imageList.length-1) {
+    oriImg = 0;
+  } else if (oriImg < 0) {
+    oriImg = imageList.length-1;
+  }
+  resizeImage(imageList[oriImg]);
+  imageMode(CENTER);
+  image(imageList[oriImg], (fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
+  rectMode(CENTER);
+  stroke(#000000); //black border
+  strokeWeight(border);
+  //Transparent rectangle
+  noFill();
+  //http://processing.org/reference/rect_.html
+  rect((fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
+
+  resizeImage(imageList[selectedImage]);//Next, selected image
+  imageMode(CENTER);
+  image(imageList[selectedImage], fullWidth*(toAnimate/100)+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
+  rectMode(CENTER);
+  stroke(#000000); //black border
+  strokeWeight(border);
+  //Transparent rectangle
+  noFill();
+  //http://processing.org/reference/rect_.html
+  rect((fullWidth*(toAnimate/100))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
+
   if (toAnimate>0) {
     toAnimate-=5;
   } else if (toAnimate<0) {
