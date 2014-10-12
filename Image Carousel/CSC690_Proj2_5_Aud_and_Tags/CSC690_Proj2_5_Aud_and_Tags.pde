@@ -47,6 +47,10 @@ Minim minim;
 AudioPlayer longSound;
 AudioPlayer shortSound;
 
+//Textfield for tags
+import java.awt.*;
+TextField tagTextField = new TextField("", 10);
+
 void setup() {
   size((int)fullWidth, (int)fullHeight);
 
@@ -78,6 +82,9 @@ void setup() {
   minim = new Minim(this);
   longSound = minim.loadFile("aud/long.wav");
   shortSound = minim.loadFile("aud/short.mp3");
+  
+  //Lets textfield listen to key presses
+  tagTextField.addKeyListener(this);
 }
 
 
@@ -100,40 +107,43 @@ void displayFullscreen() {
   }else{
     offset = 0;
   }
-    
-    int oriImg = selectedImage+offset;//Original image
-    if (oriImg > imageList.length-1) {
-      oriImg = 0;
-    } else if (oriImg < 0) {
-      oriImg = imageList.length-1;
-    }
-    resizeImage(imageList[oriImg]);
-    imageMode(CENTER);
-    image(imageList[oriImg], (fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
-    rectMode(CENTER);
-    stroke(#000000); //black border
-    strokeWeight(border);
-    //Transparent rectangle
-    noFill();
-    //http://processing.org/reference/rect_.html
-    rect((fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
-
-    resizeImage(imageList[selectedImage]);//Next, selected image
+    //Render Selected image;
+    resizeImage(imageList[selectedImage]);
     imageMode(CENTER);
     image(imageList[selectedImage], fullWidth*(toAnimate/100)+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
     rectMode(CENTER);
-    stroke(#000000); //black border
+    stroke(#5755BC);
     strokeWeight(border);
     //Transparent rectangle
     noFill();
     //http://processing.org/reference/rect_.html
     rect((fullWidth*(toAnimate/100))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
     
+    //Render next image    
+    int nextImg = selectedImage+offset;
+    if (nextImg > imageList.length-1) {
+      nextImg = 0; //Loops to beginning if reached the end
+    } else if (nextImg < 0) {
+      nextImg = imageList.length-1; //Loops to end if reached the beginning 
+    }
+    resizeImage(imageList[nextImg]);
+    imageMode(CENTER);
+    image(imageList[nextImg], (fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth, thumbHeight); 
+    rectMode(CENTER);
+    stroke(#5755BC); //Light blue border
+    strokeWeight(border);
+    //Transparent rectangle
+    noFill();
+    //http://processing.org/reference/rect_.html
+    rect((fullWidth*(offset+(toAnimate/100)))+(fullWidth/2), fullHeight/2, thumbWidth+border, thumbHeight+border);
+
   if (toAnimate>0) {
     toAnimate-=5;
   } else if (toAnimate<0) {
     toAnimate+=5;
   }
+  //last so it appears on top
+  displayTags();
 }
 void displayThumbnails() {  
   int[] display = new int[5];
@@ -291,12 +301,12 @@ void keyPressed() {
         }
         displayThumbnails();
       }
-    } else if (keyCode == UP) {
+    } else if ((keyCode == UP) && !fullscreenMode) {//Does nothing if in fullscreenMode
       shortSound.rewind();
       shortSound.play();
       fullscreenMode = true;
-      toAnimate=0;
-    } else if (keyCode == DOWN) {
+      toAnimate=0;      
+    } else if ((keyCode == DOWN)  && fullscreenMode) {//Does nothing if not in fullscreenMode{
       shortSound.rewind();
       shortSound.play();
       fullscreenMode = false; //Centers selected image
@@ -306,20 +316,23 @@ void keyPressed() {
         leftmost = imageList.length-1;
       } else {
         leftmost = selectedImage-2;
-      }
+      }      
     }
-  } else if (key == '>') {
-    if (!fullscreenMode) {//Does nothing if in fullscreenMode
+  } else if ((key == '>') && !fullscreenMode) {//Does nothing if in fullscreenMode
       shiftRight();
       selectedImage=leftmost; 
       displayThumbnails();
-    }
-  } else if (key == '<') {
-    if (!fullscreenMode) {//Does nothing if in fullscreenMode
+  } else if ((key == '<') && !fullscreenMode) {//Does nothing if in fullscreenMode
       shiftLeft();
       selectedImage=leftmost; 
-      displayThumbnails();
-    }
+      displayThumbnails();    
+  }else if ((key == RETURN||key == ENTER)&&fullscreenMode) {
+    //textField.setFocusable(false);
+//       s = textField.getText();
+//       println("textfield: "+textField.getText());
+//       println("parsed text: "+s);
+//       redraw();
+//    
   }
 } 
 
@@ -330,14 +343,14 @@ void resizeImage(PImage img) {
   float imgRatio = imgWidth/imgHeight; 
   if (fullscreenMode) { //If in fullscreen
     if (thumbRatio > imgRatio) { //If thumbnail width is larger than img height
-      thumbHeight = fullHeight-border; 
-      thumbWidth = (fullHeight-border) * imgRatio;
+      thumbHeight = fullHeight-(border*2); 
+      thumbWidth = (fullHeight-(border*2)) * imgRatio;
     } else if (thumbRatio < imgRatio) {  //If thumbnail width is larger than img height
-      thumbHeight = (fullWidth-border) * (1/imgRatio); 
-      thumbWidth = (fullWidth-border);
+      thumbHeight = (fullWidth-(border*2)) * (1/imgRatio); 
+      thumbWidth = (fullWidth-(border*2));
     } else {//If thumbnail ratio was equal to img
-      thumbHeight = fullHeight-border; 
-      thumbWidth = fullWidth-border;
+      thumbHeight = fullHeight-(border*2); 
+      thumbWidth = fullWidth-(border*2);
     }
   } else { //not in fullscreen
     if (thumbRatio > imgRatio) { //If thumbnail width is larger than img height
@@ -361,8 +374,8 @@ void mouseClicked() {
     for (offset = 0; offset<5; offset++) {
       if (mouseX > (windowWidth*offset) && //from left of thumbnail
       mouseX < ((windowWidth*offset) + windowWidth) && //to right of thumbnail
-      mouseY < ((fullHeight/2) + windowHeight) && //from vertical center up to top of thumbnail window
-      mouseY > ((fullHeight/2) - windowHeight)) //from vertical center down to bottom of thumbnail window
+      mouseY < ((fullHeight/2) + windowHeight/2) && //from vertical center up to top of thumbnail window
+      mouseY > ((fullHeight/2) - windowHeight/2)) //from vertical center down to bottom of thumbnail window
       {
         thumbSelect=true; 
         selectedImage = leftmost + offset; 
@@ -391,3 +404,8 @@ void mouseClicked() {
   }
 }
 
+void displayTags(){
+  textSize(32);
+  textAlign(CENTER);
+  text("test", fullWidth/2, fullHeight-(border/4));
+}
