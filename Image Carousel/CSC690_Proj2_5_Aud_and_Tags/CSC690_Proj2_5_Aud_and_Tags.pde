@@ -35,9 +35,7 @@ float fullHeight = 600;
 float windowHeight = fullHeight/4; //Tall, skinny images gets scaled down to 150
 float border = 50;
 float toAnimate = 0;
-int[] currentDisplay = { 
-  0, 1, 2, 3, 4
-};
+int[] currentDisplay = {0, 1, 2, 3, 4};
 boolean right = true;
 
 // Declaring an array of images.
@@ -51,8 +49,6 @@ AudioPlayer longSound;
 AudioPlayer shortSound;
 
 //Textfield for tags
-//import java.awt.*; //Not recommended
-//TextField tagTextField = new TextField("", 10);
 import controlP5.*;
 ControlP5 cp5;
 Textfield tagInputField;
@@ -91,8 +87,7 @@ void setup() {
   longSound = minim.loadFile("aud/long.wav");
   shortSound = minim.loadFile("aud/short.mp3");
 
-  //Lets textfield listen to key presses
-  //tagTextField.addKeyListener(this);
+  //Load ControlP5 elements
   tagInputField = cp5.addTextfield("tagInput")
     .setPosition((width / 2)-60, (border/4))
       .setSize(100, 20)
@@ -268,7 +263,6 @@ void shiftLeft() {
   if (leftmost < 0) {
     leftmost = imageList.length+leftmost;
   }
-  //displayThumbnails();
 }
 void shiftRight() {
   longSound.rewind();
@@ -279,7 +273,6 @@ void shiftRight() {
   if (leftmost>imageList.length-1) { //If left+5 is greater than the index of the last image
     leftmost = leftmost-imageList.length; //Find difference and set new leftmost
   }
-  //displayThumbnails();
 }
 
 void keyPressed() {
@@ -426,9 +419,6 @@ void displayTags() {
   tagInputField.setFocus(true);
   tagSaveButton.setVisible(true);
 
-  //  println("thumbWidth: "+thumbWidth);
-  //  println("thumbHeight: "+thumbHeight);
-
   textSize(25);
   textAlign(CENTER);
 
@@ -440,6 +430,16 @@ void displayTags() {
   //White text
   fill(#FFFFFF);
   text(tagList[selectedImage], (fullWidth/2), (fullHeight)-(border/4), fullWidth, border);
+
+  //ControlP5 textarea
+//  Textarea myTextarea = cp5.addTextarea("txt")
+//                           .setPosition(10,(fullHeight)-(border))
+//                           .setSize((int)fullWidth-20,(int)border)
+//                           .setFont(createFont("arial",20))
+//                           .setLineHeight(20)
+//                           .setColor(color(0))
+//                           .showScrollbar();
+//   myTextarea.setText(tagList[selectedImage]);
 }
 
 void loadTags() {
