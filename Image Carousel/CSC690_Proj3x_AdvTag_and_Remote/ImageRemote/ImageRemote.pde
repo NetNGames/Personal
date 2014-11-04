@@ -1,4 +1,25 @@
-// simple OSC sender
+/************************************************* 
+ 
+ File: CSC690_Proj3x ImageRemote
+ By: Elbert Dang
+ Date: 10/25/2014
+ 
+ Usage: Run using Processing 2.x with Minim, ControlP5, and OSXP5 libraries
+ -Load images into the data/img folder
+ System: JVM 
+ 
+ Description: Remotely controls ImageCarousel using mouse and keyboard
+               -All mouse and keyboard actions work as they do in the Carousel, except for tagging.
+               
+              Mode 0: Display images in carousel fashion
+                 -Navigate images with LEFT and RIGHT arrow keys
+                 -Press UP or click image to bring it up in Mode 1
+                 -Press < or > to shift left or right to the next group of images
+              Mode 1: Display images full screen
+                 -Navigate images with LEFT and RIGHT arrow keys
+                 -Press DOWN or click image to go back to Mode 0
+ 
+ *************************************************/
 
 import oscP5.*;
 import netP5.*;
@@ -19,45 +40,30 @@ void setup() {
    * and the port of the remote location address are the same, hence you will
    * send messages back to this sketch.
    */
-  myRemoteLocation = new NetAddress("127.0.0.1", 12000);
+  myRemoteLocation = new NetAddress("127.0.0.1", 12000); //Local
 }
-
 
 void draw() {
   background(0);
 }
 void mouseClicked() {
-  // make new message "/mouseClicked"
-  //println("Mouseclicked:" + mouseButton);
-  if(mouseButton ==LEFT){
+  //Only sends if left mouse is clicked
+  if (mouseButton ==LEFT) {
+    // make new message "/mouseClicked"
     OscMessage myMessage = new OscMessage("/mouseClicked");
 
-  /* send the message */
-  oscP5.send(myMessage, myRemoteLocation);
+    /* send the message */
+    oscP5.send(myMessage, myRemoteLocation);
   }
 }
+
 void keyPressed() {
   // make new message "/keyPressed"
-  println("keyPressed="+(int)keyCode);
   OscMessage myMessage = new OscMessage("/keyPressed");
   myMessage.add(key);
   myMessage.add(keyCode);
 
   /* send the message */
-  oscP5.send(myMessage, myRemoteLocation);
-}
-void mousePressed() {
-  //println("MouseDown");
-  // make new message "/mouseDown"
-  OscMessage myMessage = new OscMessage("/mouseDown");
-
-  /* send the message */
-  oscP5.send(myMessage, myRemoteLocation);
-}
-
-void mouseReleased() {
-  // println("MouseUp");
-  OscMessage myMessage = new OscMessage("/mouseUp");
   oscP5.send(myMessage, myRemoteLocation);
 }
 

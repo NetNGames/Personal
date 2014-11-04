@@ -1,10 +1,10 @@
 /************************************************* 
  
- File: CSC690_Proj1_5
+ File: CSC690_Proj2_5
  By: Elbert Dang
- Date: 9/21/2014
+ Date: 10/12/2014
  
- Usage: Run using Processing 2.x with ControlP5 library
+ Usage: Run using Processing 2.x with ControlP5 library installed
          -Load images into the data/img folder
  System: JVM 
  
@@ -39,11 +39,10 @@ int[] currentDisplay = {0, 1, 2, 3, 4};
 boolean right = true;
 
 // Declaring an array of images.
-PImage[] imageList;// = new PImage[maxImages]; 
+PImage[] imageList;
 
 //Loading audio
 import ddf.minim.*;
-
 Minim minim;
 AudioPlayer longSound;
 AudioPlayer shortSound;
@@ -53,12 +52,11 @@ import controlP5.*;
 ControlP5 cp5;
 Textfield tagInputField;
 Button tagSaveButton;
-String[] tagList;
-String tagInput="";
+String[] tagList; //List of all tags
+String tagInput=""; //Input from textfield
 
 void setup() {
   size((int)fullWidth, (int)fullHeight);
-  //add(tagTextField); //awt
   cp5 = new ControlP5(this);
   // Loading the images into the array
   //From http://processing.org/discourse/beta/num_1253083238.html and http://processing.org/discourse/beta/num_1247100666.html
@@ -73,9 +71,9 @@ void setup() {
     int j=0;
     for (int i=0; i < list.length; i ++ ) { //Loops through data list
       if (list[i].endsWith("png")||  //Loads into image array if it's a picture
-      list[i].endsWith("jpg")||
-        list[i].endsWith("gif")||
-        list[i].endsWith("bmp")) {
+          list[i].endsWith("jpg")||
+          list[i].endsWith("gif")||
+          list[i].endsWith("bmp")) {
         imageList[j] = loadImage( "img/"+list[i] );
         j++;
       }
@@ -88,12 +86,14 @@ void setup() {
   shortSound = minim.loadFile("aud/short.mp3");
 
   //Load ControlP5 elements
+  //Textfield for adding tags
   tagInputField = cp5.addTextfield("tagInput")
     .setPosition((width / 2)-60, (border/4))
       .setSize(100, 20)
         .setVisible(false)
           .setCaptionLabel("Press Return to add tag")
             .setFocus(true);
+  //Button for saving tags to file
   tagSaveButton = cp5.addButton("saveButton")
     .setPosition((width / 2)+50, (border/4))
       .setSize(70, 20)
@@ -243,7 +243,7 @@ void drawThumbnails(int[] images) {
     }
   }
 }
-
+//Draws border around currently selected image
 void selectBorder(PImage image, int offset) {
   rectMode(CENTER); 
   stroke(#5755BC); 
@@ -411,7 +411,7 @@ void mouseClicked() {
       shortSound.play();
       fullscreenMode = true;
     }
-  }
+  }//Removed ability to click back to thumbnail view
 }
 
 void displayTags() {
@@ -431,7 +431,7 @@ void displayTags() {
   fill(#FFFFFF);
   text(tagList[selectedImage], (fullWidth/2), (fullHeight)-(border/4), fullWidth, border);
 
-  //ControlP5 textarea
+  //ControlP5 textarea works but text isn't centered nor does the scrollbar work for long tags
 //  Textarea myTextarea = cp5.addTextarea("txt")
 //                           .setPosition(10,(fullHeight)-(border))
 //                           .setSize((int)fullWidth-20,(int)border)
@@ -444,22 +444,23 @@ void displayTags() {
 
 void loadTags() {
   BufferedReader reader;
+  //Creates list of tags corresponding to imageList
   tagList = new String[imageList.length];
 
   for (int i = 0; i<tagList.length; i++) {
     //Checks to see if file exists
-    File f = new File(dataPath("/tag/" + list[i]+"_tag.txt"));
+    File f = new File(sketchPath +"/data/tag/" + list[i]+"_tag.txt");
     if (f.exists())
     {
       try {
         //If it exists, readline from the file 
-        reader = createReader(dataPath("/tag/" + list[i]+"_tag.txt"));
+        reader = createReader(sketchPath +"/data/tag/" + list[i]+"_tag.txt");
         tagList[i]=reader.readLine();
       } 
       catch (IOException e) {
         e.printStackTrace();
       }
-    } else {
+    } else { //Adds "No tags" if tag file with image name wasn't found
       tagList[i]="No tags";
     }
   }
@@ -468,9 +469,9 @@ void loadTags() {
 void saveTags() {
   PrintWriter output;
   for (int i = 0; i<tagList.length; i++) {
-    if (!tagList[i].equals("No tags")) {
-      output = createWriter(dataPath("/tag/" + list[i]+"_tag.txt"));
-      output.print(tagList[i]);
+    if (!tagList[i].equals("No tags")) { //Don't create tag file if no new tags
+      output = createWriter(sketchPath +"/data/tag/" + list[i]+"_tag.txt");
+      output.print(tagList[i]); //Overwrites tag file if it existed
       tagSaveButton.setCaptionLabel("Tags saved OK!");
       output.flush(); // Writes the remaining data to the file
       output.close(); // Finishes the file
@@ -481,14 +482,14 @@ void saveTags() {
 //Listens for control input
 void controlEvent(ControlEvent theEvent) {
   //From http://www.kasperkamperman.com/blog/processing-code/controlp5-library-example1/comment-page-1/
-  if (theEvent.controller().name()=="tagInput") {    
-    tagSaveButton.setCaptionLabel("Save Tags");
+  if (theEvent.controller().name()=="tagInput") { //Listens for input from tagInput textfield
+    tagSaveButton.setCaptionLabel("Save Tags");  //Resets SaveButton label if needed
     if (tagList[selectedImage].equals("No tags")) {
-      tagList[selectedImage]="#"+tagInput;
+      tagList[selectedImage]="#"+tagInput; //Overwrites tag if no previous tags
     } else {
-      tagList[selectedImage]+=" #"+tagInput;
+      tagList[selectedImage]+=" #"+tagInput; //Adds to tag if previous tags detected
     }
-  } else if (theEvent.controller().name()=="saveButton") {
+  } else if (theEvent.controller().name()=="saveButton") {//Checks to see if saveButton was pressed
     saveTags();
   }
 }

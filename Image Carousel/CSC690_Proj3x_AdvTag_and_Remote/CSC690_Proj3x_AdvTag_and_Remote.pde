@@ -16,10 +16,10 @@
                  -Navigate images with LEFT and RIGHT arrow keys
                  -Press DOWN or click image to go back to Mode 0
                  -Type text into textbox to add image tags
-                 --Press Enter while in textbox to add tag
-                 --Press SaveTags button to save all edited tags to file
-                 -Press TagBoxTo create rectangular tag
-                 --Pressing down on mouse, draw outline, release, and enter tag in popup menu.
+                  --Press Enter while in textbox to add tag
+                  --Press SaveTags button to save all edited tags to file
+                 -Press TagBox to create rectangular tag
+                  --Press down on mouse, draw outline, release, and enter tag in popup menu.
                  
 1.5 update - Add animated transitions and mouseclick to open
 2.5 update - Add sounds for screen transitions
@@ -44,7 +44,7 @@ float windowHeight = fullHeight/4; //Tall, skinny images gets scaled down to 150
 float border = 50;
 float toAnimate = 0;
 int[] currentDisplay = {0, 1, 2, 3, 4};
-boolean right = true;
+boolean shiftingRight = true;
 
 // Declaring an array of images.
 PImage[] imageList;
@@ -63,13 +63,18 @@ Button tagSaveButton;
 String[] tagList; //List of all tags
 String tagInput=""; //Input from textfield
 
+//For advanced tagging
+boolean isTagging=false;
+String[] tagBoxList;
+Textfield tagBoxInputField;
+Button tagBoxButton;
+String tagBoxInput="";
+String tempTag;
+
 //Remote control receiver from OSCReceiver
 import oscP5.*;
 import netP5.*;
-
 OscP5 oscP5;
-//boolean isMouseDown = false;
-int mX = 0, mY = 0;
 
 void setup() {
   size((int)fullWidth, (int)fullHeight);
@@ -101,7 +106,7 @@ void setup() {
   longSound = minim.loadFile("aud/long.wav");
   shortSound = minim.loadFile("aud/short.mp3");
 
-  //Load ControlP5 elements
+  //-----Load ControlP5 elements----\\
   //Textfield for adding tags
   tagInputField = cp5.addTextfield("tagInput")
     .setPosition((width / 2)-60, (border/4))
@@ -115,6 +120,18 @@ void setup() {
       .setSize(70, 20)
         .setVisible(false)
           .setCaptionLabel("Save Tags");
+  //Popup input field for box tags
+  tagBoxInputField = cp5.addTextfield("tagBoxInput")
+      .setSize(100, 20)
+        .setVisible(false)
+          .setCaptionLabel("Press Return to add tag");;
+  //Button activate tagBox mode
+  tagBoxButton = cp5.addButton("boxButton")
+    .setPosition((width / 2)-120, (border/4))
+      .setSize(50, 20)
+        .setVisible(false)
+          .setCaptionLabel("Tag Box");
+            //.Toggle
   loadTags();
   
   /* start oscP5, listening for incoming messages at port 12000 */
@@ -129,13 +146,18 @@ void draw() {
   } else {
     tagInputField.setVisible(false);
     tagSaveButton.setVisible(false);
+    tagBoxButton.setVisible(false);
     thumbRatio=windowWidth/windowHeight;
     displayThumbnails();
   }
   
-  //Display remote control curser on top
+  //Display curser on top
+  stroke(#D2E327); //Gold border
+  strokeWeight(5);
+  fill(100); //Grey inside
   ellipse(mouseX, mouseY, 10, 10);
 }
+
 void displayFullscreen() {
   thumbRatio=(fullWidth-(border*2))/(fullHeight-(border*2));
   int offset;//offset of leftmost of current images
@@ -178,12 +200,16 @@ void displayFullscreen() {
 
   if (toAnimate>0) {
     toAnimate-=5;
+    tagBoxButton.setVisible(false);
   } else if (toAnimate<0) {
     toAnimate+=5;
+    tagBoxButton.setVisible(false);
   } else {
     //last so it appears on top of image and border
     //Only appears when images are not moving
+    tagBoxButton.setVisible(true);
     displayTags();
+    displayTagBoxes();
   }
 }
 void displayThumbnails() {  
@@ -238,7 +264,7 @@ void displayThumbnails() {
 
 void drawThumbnails(int[] images) {
   int offset;//offset of leftmost of current images
-  if (right) { //if shifting right
+  if (shiftingRight) { //if shifting right
     offset = -5;
   } else { //if shifting left
     offset=5;
@@ -279,7 +305,7 @@ void selectBorder(PImage image, int offset) {
 void shiftLeft() { 
   longSound.rewind();
   longSound.play();
-  right = false;
+  shiftingRight = false;
   toAnimate = -500; 
   leftmost = leftmost-5; 
   if (leftmost < 0) {
@@ -289,14 +315,44 @@ void shiftLeft() {
 void shiftRight() {
   longSound.rewind();
   longSound.play();
-  right = true;
+  shiftingRight = true;
   toAnimate = 500; 
   leftmost = leftmost+5; 
   if (leftmost>imageList.length-1) { //If left+5 is greater than the index of the last image
     leftmost = leftmost-imageList.length; //Find difference and set new leftmost
   }
 }
+//Resizes image to appropriate size
+void resizeImage(PImage img) {
+  float imgHeight = img.height; 
+  float imgWidth = img.width; 
+  float imgRatio = imgWidth/imgHeight; 
+  if (fullscreenMode) { //If in fullscreen
+    if (thumbRatio > imgRatio) { //If thumbnail width is larger than img height
+      thumbHeight = fullHeight-(border*2); 
+      thumbWidth = (fullHeight-(border*2)) * imgRatio;
+    } else if (thumbRatio < imgRatio) {  //If thumbnail width is larger than img height
+      thumbHeight = (fullWidth-(border*2)) * (1/imgRatio); 
+      thumbWidth = (fullWidth-(border*2));
+    } else {//If thumbnail ratio was equal to img
+      thumbHeight = fullHeight-(border*2); 
+      thumbWidth = fullWidth-(border*2);
+    }
+  } else { //not in fullscreen
+    if (thumbRatio > imgRatio) { //If thumbnail width is larger than img height
+      thumbHeight = windowHeight-(border/2); 
+      thumbWidth = (windowHeight-(border/2)) * imgRatio;
+    } else if (thumbRatio < imgRatio) {  //If thumbnail width is smaller than img height
+      thumbHeight = (windowWidth-(border/2)) * (1/imgRatio); 
+      thumbWidth = windowWidth-(border/2);
+    } else {//If thumbnail ratio was equal to img's
+      thumbHeight = windowWidth-(border/2); 
+      thumbWidth = windowWidth-(border/2);
+    }
+  }
+}
 
+//----------------------------------I/O Events-------------------------\\
 void keyPressed() {
   if (key == CODED) {    
     if (keyCode == LEFT) {
@@ -379,42 +435,9 @@ void keyPressed() {
   }
 } 
 
-//Resizes image to appropriate size
-void resizeImage(PImage img) {
-  float imgHeight = img.height; 
-  float imgWidth = img.width; 
-  float imgRatio = imgWidth/imgHeight; 
-  if (fullscreenMode) { //If in fullscreen
-    if (thumbRatio > imgRatio) { //If thumbnail width is larger than img height
-      thumbHeight = fullHeight-(border*2); 
-      thumbWidth = (fullHeight-(border*2)) * imgRatio;
-    } else if (thumbRatio < imgRatio) {  //If thumbnail width is larger than img height
-      thumbHeight = (fullWidth-(border*2)) * (1/imgRatio); 
-      thumbWidth = (fullWidth-(border*2));
-    } else {//If thumbnail ratio was equal to img
-      thumbHeight = fullHeight-(border*2); 
-      thumbWidth = fullWidth-(border*2);
-    }
-  } else { //not in fullscreen
-    if (thumbRatio > imgRatio) { //If thumbnail width is larger than img height
-      thumbHeight = windowHeight-(border/2); 
-      thumbWidth = (windowHeight-(border/2)) * imgRatio;
-    } else if (thumbRatio < imgRatio) {  //If thumbnail width is smaller than img height
-      thumbHeight = (windowWidth-(border/2)) * (1/imgRatio); 
-      thumbWidth = windowWidth-(border/2);
-    } else {//If thumbnail ratio was equal to img's
-      thumbHeight = windowWidth-(border/2); 
-      thumbWidth = windowWidth-(border/2);
-    }
-  }
-}
-
 void mouseClicked() {
-  println("Mouseclicked");
-  println("x=" + mouseX);
-  println("y=" + mouseY);
   if (!fullscreenMode && mouseButton == LEFT) { //Left mouse click on thumbnail
-    println("leftclick");
+    //println("leftclick");
     boolean thumbSelect = false; 
     //println("(" + mouseX+", " + mouseY +")");
     int offset; 
@@ -440,40 +463,42 @@ void mouseClicked() {
   }//Removed ability to click back to thumbnail view
 }
 
-void displayTags() {
-  tagInputField.setVisible(true);
-  tagInputField.setFocus(true);
-  tagSaveButton.setVisible(true);
+//----------------------------------Tagging-------------------------\\
+int a=-50,b=-50,c,d;
+void mousePressed() {
+  if(isTagging){
+    tagBoxInputField.setVisible(false);
+    a=mouseX;
+    b=mouseY;
+  }  
+}
 
-  textSize(25);
-  textAlign(CENTER);
-
-  //Black Outline
-  fill(#000000);
-  text(tagList[selectedImage], (fullWidth/2)-1, (fullHeight)-(border/4)-1, fullWidth, border);
-  text(tagList[selectedImage], (fullWidth/2)+1, (fullHeight)-(border/4)+1, fullWidth, border);
-
-  //White text
-  fill(#FFFFFF);
-  text(tagList[selectedImage], (fullWidth/2), (fullHeight)-(border/4), fullWidth, border);
-
-  //ControlP5 textarea works but text isn't centered nor does the scrollbar work for long tags
-//  Textarea myTextarea = cp5.addTextarea("txt")
-//                           .setPosition(10,(fullHeight)-(border))
-//                           .setSize((int)fullWidth-20,(int)border)
-//                           .setFont(createFont("arial",20))
-//                           .setLineHeight(20)
-//                           .setColor(color(0))
-//                           .showScrollbar();
-//   myTextarea.setText(tagList[selectedImage]);
+void mouseDragged() {
+  if(isTagging){
+    tagBoxInputField.setVisible(false);
+    c=mouseX-a;
+    d=mouseY-b;
+  }
+}
+void mouseReleased(){
+  if(isTagging){
+    if(a!=0 && b!=0 && c!=0 && d!=0){ //If values had changed
+      tempTag = "("+a+","+b+","+c+","+d+",";
+    }
+    tagBoxInputField.setPosition(a+c/2-50, b+d/2);
+    tagBoxInputField.setVisible(true);
+    tagBoxInputField.setFocus(true);
+  }  
 }
 
 void loadTags() {
   BufferedReader reader;
   //Creates list of tags corresponding to imageList
   tagList = new String[imageList.length];
-
-  for (int i = 0; i<tagList.length; i++) {
+  tagBoxList = new String[imageList.length];
+  String currentLine = "";
+  
+  for (int i = 0; i<imageList.length; i++) {
     //Checks to see if file exists
     File f = new File(dataPath("/tag/" + list[i]+"_tag.txt"));
     if (f.exists())
@@ -481,7 +506,24 @@ void loadTags() {
       try {
         //If it exists, readline from the file 
         reader = createReader(dataPath("/tag/" + list[i]+"_tag.txt"));
-        tagList[i]=reader.readLine();
+        while((currentLine=reader.readLine())!=null){
+          if(currentLine.charAt(0)=='#'){ //If it's a standard tag
+            if (tagList[i]==null){ //If list is empty
+              tagList[i]=currentLine;
+            } else{
+              tagList[i]+=" "+ currentLine;
+            }            
+          }else if(currentLine.charAt(0)=='('){//If it's a box tag
+            if (tagBoxList[i]==null){ //If list is empty
+              tagBoxList[i]=currentLine;
+            } else{
+              tagBoxList[i]+=currentLine;
+            }
+          }
+        }
+       if(tagList[i]==null){ //If no standard tags
+         tagList[i]="No tags";
+       }
       } 
       catch (IOException e) {
         e.printStackTrace();
@@ -493,11 +535,21 @@ void loadTags() {
 }
 
 void saveTags() {
-  PrintWriter output;
-  for (int i = 0; i<tagList.length; i++) {
-    if (!tagList[i].equals("No tags")) { //Don't create tag file if no new tags
-      output = createWriter(dataPath("/tag/" + list[i]+"_tag.txt"));
-      output.print(tagList[i]); //Overwrites tag file if it existed
+  PrintWriter output;  
+  for (int i = 0; i<imageList.length; i++) {
+    String writeTag="";
+    if (!tagList[i].equals("No tags") || tagBoxList[i]!=null) { //Don't create tag file if no new tags
+      output = createWriter(dataPath("/tag/" + list[i]+"_tag.txt"));//create tag file with originalName_tag.txt extension 
+      if (!tagList[i].equals("No tags")){
+        writeTag+=tagList[i]+"\n";
+        //println("standard tags: " + writeTag);
+      }
+      if (tagBoxList[i]!=null){
+        writeTag+=tagBoxList[i];
+        //println("box tags: " + writeTag);
+      }
+      //println("all tags: " + writeTag);
+      output.print(writeTag); //Overwrites tag file if it existed
       tagSaveButton.setCaptionLabel("Tags saved OK!");
       output.flush(); // Writes the remaining data to the file
       output.close(); // Finishes the file
@@ -505,9 +557,86 @@ void saveTags() {
   }
 }
 
+void displayTags() {
+  if(isTagging){
+    rectMode(CORNER);
+    noFill();
+    strokeWeight(5);
+    stroke(#FF0000);
+    rect(a, b, c, d);
+    tagInputField.setVisible(false);
+    tagSaveButton.setVisible(false);
+  } else{
+    tagInputField.setVisible(true);
+    tagInputField.setFocus(true);
+    tagSaveButton.setVisible(true);
+    tagBoxButton.setVisible(true);
+  }
+  //println("current tags: "+tagBoxList[selectedImage]);
+  //println("current tags: "+tagList[selectedImage]);
+  textSize(25);
+  if(tagList[selectedImage]!=null){
+    
+  textAlign(CENTER);
+    //Black Outline
+    fill(#000000);
+    text(tagList[selectedImage], (fullWidth/2)-1, (fullHeight)-(border/4)-1, fullWidth, border);
+    text(tagList[selectedImage], (fullWidth/2)+1, (fullHeight)-(border/4)+1, fullWidth, border);
+
+    //White text
+    fill(#FFFFFF);
+    text(tagList[selectedImage], (fullWidth/2), (fullHeight)-(border/4), fullWidth, border);
+  }
+}
+
+void displayTagBoxes(){
+  if(isTagging){
+    tagBoxButton.setCaptionLabel("Tagging...");
+  }else{
+    tagBoxButton.setCaptionLabel("Tag Box");
+  }
+  if(tagBoxList[selectedImage]!=null){
+    //From http://stackoverflow.com/a/5993823
+    String[] parseTagBox = tagBoxList[selectedImage].split(",|\\(|\\)");
+    //println("length= " + parseTagBox.length);
+    if (parseTagBox.length%6==0){//If it has full tag info (5 strings)
+      for(int i=1;i<parseTagBox.length;i+=6){ //Since it creates a null after '(', go up by 6 instead of 5
+        int x=Integer.parseInt(parseTagBox[i]);
+        int y=Integer.parseInt(parseTagBox[i+1]);
+        int w=Integer.parseInt(parseTagBox[i+2]);
+        int h=Integer.parseInt(parseTagBox[i+3]);
+      
+        rectMode(CORNER);
+        noFill();
+        strokeWeight(5);
+        stroke(#FF0000);
+        rect(x,y,w,h);
+        if ((mouseX > x && mouseX < x+w && mouseY > y && mouseY < y+h) || //If rectangle was drawn upper left to lower right
+            (mouseX > x+w && mouseX < x && mouseY > y && mouseY < y+h) || //If rectangle was drawn upper right to lower left
+            (mouseX > x && mouseX < x+w && mouseY > y+h && mouseY < y) || //If rectangle was drawn lower left to upper right
+            (mouseX > x+w && mouseX < x && mouseY > y+h && mouseY < y)) //If rectangle was drawn lower right to upper left
+        {
+          textSize(25);
+          //Black Outline
+          fill(#000000);
+          text(parseTagBox[i+4], x+(w/2)-(parseTagBox[i+4].length()/2)+1, y+(h/2)+1);
+          text(parseTagBox[i+4], x+(w/2)-(parseTagBox[i+4].length()/2)-1, y+(h/2)-1);
+  
+          //White Outline
+          fill(#FFFFFF);
+          text(parseTagBox[i+4], x+(w/2)-(parseTagBox[i+4].length()/2), y+(h/2));
+        }
+      }
+    }
+  }
+}
+
+
+//----------------------------Textfield and Button Controls-------------------------\\
 //Listens for control input
 void controlEvent(ControlEvent theEvent) {
   //From http://www.kasperkamperman.com/blog/processing-code/controlp5-library-example1/comment-page-1/
+  //----Standard Tags---\\
   if (theEvent.controller().name()=="tagInput") { //Listens for input from tagInput textfield
     tagSaveButton.setCaptionLabel("Save Tags");  //Resets SaveButton label if needed
     if (tagList[selectedImage].equals("No tags")) {
@@ -517,22 +646,36 @@ void controlEvent(ControlEvent theEvent) {
     }
   } else if (theEvent.controller().name()=="saveButton") {//Checks to see if saveButton was pressed
     saveTags();
+    
+  //----Box Tags---\\
+  } else if (theEvent.controller().name()=="tagBoxInput") { //Listens for input from tagInput textfield
+    tagBoxInputField.setVisible(false); //Removes popup
+    tagInputField.setVisible(true);
+    tagSaveButton.setVisible(true);
+    tempTag+=tagBoxInput+")";
+    if(tagBoxList[selectedImage]==null){
+      tagBoxList[selectedImage]=tempTag;
+    }else{
+      tagBoxList[selectedImage]+=tempTag;
+    }
+    isTagging=false;
+  }else if (theEvent.controller().name()=="boxButton") {
+    isTagging = true;
+    tempTag="";
+    tagBoxInputField.setVisible(false);
+    tagInputField.setVisible(false);
+    tagSaveButton.setVisible(false);
+    tagBoxButton.setCaptionLabel("Tagging...");
   }
 }
+
+//-------------------------------Remote-------------------------\\
 
 /* incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage theOscMessage) {
 
-  if (theOscMessage.checkAddrPattern("/mouseDown")==true) {
-    //isMouseDown = true;
-  }
-  else if (theOscMessage.checkAddrPattern("/mouseUp")==true) {
-    //isMouseDown = false;
-  }
-  else if (theOscMessage.checkAddrPattern("/mouseClicked")==true) {
-    //isMouseDown = false;
-    
-    mouseButton = LEFT;
+  if (theOscMessage.checkAddrPattern("/mouseClicked")==true) {
+   mouseButton = LEFT;
    mouseClicked();
   }
   else if (theOscMessage.checkAddrPattern("/mouseMoved")==true) {
