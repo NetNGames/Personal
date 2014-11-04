@@ -500,12 +500,12 @@ void loadTags() {
   
   for (int i = 0; i<imageList.length; i++) {
     //Checks to see if file exists
-    File f = new File(dataPath("/tag/" + list[i]+"_tag.txt"));
+    File f = new File(sketchPath + "/data/tag/" + list[i]+"_tag.txt");
     if (f.exists())
     {
       try {
         //If it exists, readline from the file 
-        reader = createReader(dataPath("/tag/" + list[i]+"_tag.txt"));
+        reader = createReader(sketchPath + "/data/tag/" + list[i]+"_tag.txt");
         while((currentLine=reader.readLine())!=null){
           if(currentLine.charAt(0)=='#'){ //If it's a standard tag
             if (tagList[i]==null){ //If list is empty
@@ -534,29 +534,6 @@ void loadTags() {
   }
 }
 
-void saveTags() {
-  PrintWriter output;  
-  for (int i = 0; i<imageList.length; i++) {
-    String writeTag="";
-    if (!tagList[i].equals("No tags") || tagBoxList[i]!=null) { //Don't create tag file if no new tags
-      output = createWriter(dataPath("/tag/" + list[i]+"_tag.txt"));//create tag file with originalName_tag.txt extension 
-      if (!tagList[i].equals("No tags")){
-        writeTag+=tagList[i]+"\n";
-        //println("standard tags: " + writeTag);
-      }
-      if (tagBoxList[i]!=null){
-        writeTag+=tagBoxList[i];
-        //println("box tags: " + writeTag);
-      }
-      //println("all tags: " + writeTag);
-      output.print(writeTag); //Overwrites tag file if it existed
-      tagSaveButton.setCaptionLabel("Tags saved OK!");
-      output.flush(); // Writes the remaining data to the file
-      output.close(); // Finishes the file
-    }
-  }
-}
-
 void displayTags() {
   if(isTagging){
     rectMode(CORNER);
@@ -572,8 +549,7 @@ void displayTags() {
     tagSaveButton.setVisible(true);
     tagBoxButton.setVisible(true);
   }
-  //println("current tags: "+tagBoxList[selectedImage]);
-  //println("current tags: "+tagList[selectedImage]);
+  
   textSize(25);
   if(tagList[selectedImage]!=null){
     
@@ -631,6 +607,28 @@ void displayTagBoxes(){
   }
 }
 
+void saveTags() {
+  PrintWriter output;  
+  for (int i = 0; i<imageList.length; i++) {
+    String writeTag="";
+    if (!tagList[i].equals("No tags") || tagBoxList[i]!=null) { //Don't create tag file if no new tags
+      output = createWriter(sketchPath + "/data/tag/" + list[i]+"_tag.txt");//create tag file with originalName_tag.txt extension 
+      if (!tagList[i].equals("No tags")){
+        writeTag+=tagList[i]+"\n";
+        //println("standard tags: " + writeTag);
+      }
+      if (tagBoxList[i]!=null){
+        writeTag+=tagBoxList[i];
+        //println("box tags: " + writeTag);
+      }
+      //println("all tags: " + writeTag);
+      output.print(writeTag); //Overwrites tag file if it existed
+      tagSaveButton.setCaptionLabel("Tags saved OK!");
+      output.flush(); // Writes the remaining data to the file
+      output.close(); // Finishes the file
+    }
+  }
+}
 
 //----------------------------Textfield and Button Controls-------------------------\\
 //Listens for control input
