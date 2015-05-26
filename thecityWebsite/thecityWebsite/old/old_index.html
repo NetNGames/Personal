@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Elbert Dang's CSC 412 Website
+        </title>        
+        <link rel="stylesheet" type="text/css" href="site.css">
+    </head>
+    <body>
+        <style>
+            ul
+            {
+                list-style-type:none;
+                margin:0;
+                padding:0;
+            }
+            a
+            {
+                display:block;
+                width:60px;
+
+            }
+            li
+            {
+                float:center;
+            }
+        </style>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script>
+           // $(document).ready(function() {
+                $("button").click(function() {
+                    $("#main").toggle();
+                });
+           // });
+        </script>
+       <!-- <script src="https://github.com/bgrins/spectrum/blob/master/spectrum.js"></script>
+        <link rel='stylesheet' href='https://github.com/bgrins/spectrum/blob/master/spectrum.css' />
+         <script>
+            $("#changeBackgroundColor").spectrum({
+                color: "#ECC",
+                showInput: true,
+                className: "full-spectrum",
+                showInitial: true,
+                preferredFormat: "hex",
+                localStorageKey: "spectrum.demo",
+                move: function(color) {
+
+                },
+                show: function() {
+
+                },
+                beforeShow: function() {
+
+                },
+                // hide: function() { },
+                change: function() {
+
+                },
+            });
+
+        </script> -->
+        <div id="banner">
+            <h1 class="centered">Hello world!</h1>
+        </div>
+
+        <div id="main">            
+            <br>This is the page of Elbert Dang.</br>
+            <br class="centered sansSerif">"Don't worry that your children never listen to you; worry that they are
+            always watching you."</br>
+            <br class="centered sansSerif">-Robert Fulgham</br>
+            <div id="navBar">
+
+                <ul>
+                    <li><br><a href="old_current.html">Current Work</a> </li>
+                    <li><br><a href="old_about.html">About me</a></li>
+                    <li><br><a href="tutorial.html">Tutorial Page</a> </li>
+                    <li><br><a href="/~edang/index.html">Bootstrap Website</a> </li>
+                    <li><br><a href="old_visitorLog.html">Visitors</a> </li>
+                    <li><br><a href="old_visitorQuotes.html">Quotes</a> </li>
+                </ul>
+            </div>
+        </div>
+        <div id="footer">
+            <script>
+                function changeNavBar()
+                {
+                    x = document.getElementById("navBar") // Find the element
+                    x.style.color = "#ff0000";          // Change the style
+                    if (x.style.backgroundColor == "white") {
+                        x.style.backgroundColor = "#ccccff";
+                    }
+                    else {
+                        x.style.backgroundColor = "white";
+                    }
+                }
+                function changeBackground()
+                {
+                    if (document.body.style.backgroundColor == "#424242") {
+                        document.body.style.backgroundColor = "#ffffff";
+                    }
+                    else {
+                        document.body.style.backgroundColor = "#424242";
+                    }
+                    
+                }
+            </script>
+
+            <button type="button" onclick="changeNavBar()">Change navBar color</button>
+            <button type="button" onclick="changeBackground()">Change background color</button>
+            <p>
+                <a href="http://jigsaw.w3.org/css-validator/check/referer">
+                    <img style="border:0;width:88px;height:31px"
+                         src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
+                         alt="Valid CSS!" />
+                </a>
+            </p>
+            <!--<button>Hide Body</button>
+            <input type='text' id="changeBackgroundColor"/> -->
+        </div>
+
+    </body>
+</html>

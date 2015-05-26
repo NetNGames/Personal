@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Visitor Log</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body>
+        <div>
+            Insert into database:<br>
+            <form action="old_visitorQuotes.php" method="post">
+                Quote: <input type="text" name="quote"><br>
+                Person: <input type="text" name="person"><br>
+                <input type="submit">
+            </form>
+            <br>Search Database:</br>
+            <form action="searchQuotes.php" method="post">
+                Quote: <input type="text" name="quote"><br>
+                Person: <input type="text" name="person"><br>
+                <input type="submit">
+            </form>
+        </div>
+    </body>
+</html>
