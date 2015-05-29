@@ -14,7 +14,7 @@
 
         <!-- CSS code from Bootply.com editor -->
         <style type="text/css">
-           
+
             @media screen and (min-width: 768px) {
                 #masthead h1 {
                     font-size: 50px;
@@ -51,12 +51,12 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="/~edang" class="navbar-brand"><strong>Home</strong></a>
+                    <a href="/~edang" class="navbar-brand active"><strong>Home</strong></a>
                 </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="current.html">Employment</a>
+                            <a href="employment.html">Employment</a>
                         </li>
 
                         <!--<li>
@@ -128,21 +128,31 @@
                     <hr class="col-md-12">
 
 
-                    <hr>
                     <h2 id="sec3">Other Links</h2>
-                    <li><a href="https://github.com/NetNGames" target="_blank"><img src="imgs/logo_GitHub.png" alt="Git" width="64" height="64">  My Github</a></li>
-                    <li><a href="https://www.linkedin.com/pub/elbert-dang/91/34b/873" target="_blank"><img src="imgs/logo_LinkedIn.png" alt="Linked" width="258" height="64">  My LinkedIn</a></li>
+                    <div style="float:left; display:inline-block;">
+                        <div style="float:left; margin-right: 10px;">
+                            <a href="https://github.com/NetNGames" target="_blank">
+                                <img src="imgs/logo_GitHub.png" alt="Git" width="64" height="64">
+                                <div class="caption">
+                                    My Github
+                                </div>
+                            </a>
 
-                    <hr class="col-md-12">
-
-                    
-                    <hr>
-
+                        </div>
+                        <div style="float:left;">
+                            <a href="https://www.linkedin.com/pub/elbert-dang/91/34b/873" target="_blank">
+                                <img src="imgs/logo_In.png" alt="Linked" width="64" height="64">
+                                <div class="caption">
+                                    My LinkedIn
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div> 
             </div>
         </div>
 
-        
+
 
 
 
@@ -191,8 +201,9 @@
         <div id="footer">
             <ul>
                 <li><a href="http://bootply.com/100983">Created with Bootstrap Sidebar with Affix and Scrollspy</a></li>
-                <li><a href="assets/bootply.html">Download template here</a></li>
+                <!--<li><a href="assets/bootply.html">Download template here</a></li>-->
             </ul>
         </div>
+        <?php //include 'assets/footer.php'; ?>
     </body>
 </html>
