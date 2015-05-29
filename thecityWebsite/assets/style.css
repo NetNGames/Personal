@@ -1,0 +1,56 @@
+/* 
+    Created on : May 26, 2015, 2:47:11 PM
+    Author     : Elbert
+*/
+
+body {
+    padding-top:50px;
+}
+
+#masthead {
+    min-height:250px;
+}
+
+#masthead h1 {
+    font-size: 30px;
+    line-height: 1;
+    padding-top:20px;
+}
+
+#masthead .well {
+    margin-top:8%;
+}
+
+.navbar-bright {
+    background-color:#111155;
+    color:#fff;
+}
+
+.affix-top,.affix{
+    position: static;
+}
+
+#sidebar li.active {
+    border:0 #eee solid;
+    border-right-width:4px;
+}
+div#footer
+{
+    clear: both;
+    padding: .5em 1em;
+    border-top: 1px solid #999;
+    text-align: right;
+}
+
+div#footer ul
+{
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+div#footer li
+{
+    display: inline;
+    margin-right: 1em;
+}
