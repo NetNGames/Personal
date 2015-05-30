@@ -119,18 +119,95 @@
 
                     <hr>
                     <h2 id="sec2">School Projects</h2>
-                    <li><a href="http://sfsuswe.com/~s15g10/" target="_blank">PetFriend - CSC648 Software Engineering Final Project</a></li>
-                    <li><a href="http://smurf.sfsu.edu/~wob/" target="_blank">Cards of the Wild - CSC631 Multiplayer Game Development Project</a></li>
-                    <li><a href="http://mirix5.github.io/processingvideoeditor/" target="_blank"><img src="imgs/PVE.PNG" alt="PVEDefault" width="200" height="150">   Processing Video Editor  </a></li>
-                    <li><a href="tankgame.html" target="_blank">Splitscreen Tank Game</a></li>
-                    <li><a href="wingman.html" target="_blank">Wingman Game</a></li>
+                    <div class="row">  
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="http://sfsuswe.com/~s15g10/" target="_blank">
+                                        <h3>PetFriend</h3>                                        
+                                    </a>
+                                    <!--<img src="imgs/logo_Sparkpoint.png" alt="SparkpointLogo" width="280" height="72">-->
+                                </div>
+                                <div class="panel-body">
+                                    A fully functional Pet Adoption website created as a Final Project for our CSC648 Software Engineering Class. The website is managed through an SVN server and it is built with JQuery, Bootstrap and MySQL database. [THE WEBSITE IS BUILT FOR SFSU FINAL PROJECT AND IT IS NOT FOR COMMERCIAL USE]
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="http://smurf.sfsu.edu/~wob/" target="_blank">
+                                        <h3>Cards of the Wild</h3>
+                                    </a>
+                                    <!--<img src="imgs/logo_Sparkpoint.png" alt="SparkpointLogo" width="280" height="72">-->
+                                </div>
+                                <div class="panel-body">
+                                    A Hearthstone-style battle card game created with the Unity game engine and based 
+                                    on the World of Balance's Serengeti ecosystem. Features online multiplayer through
+                                    the World of Balance Lobby, and over 80 different animal cards to use against an
+                                    opposing player. Players are represented by a Tree of Life, which they must protect
+                                    against enemy Herbivores who can attack the Tree, Carnivores who can attack their
+                                    animals, and Omnivores who can attack either, using their own animals.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="http://mirix5.github.io/processingvideoeditor/" target="_blank">
+                                        <h3>Processing Video Editor</h3>
+                                    </a>
+                                    <img src="imgs/PVE.PNG" alt="PVEDefault" width="200" height="150">
+                                </div>
+                                <div class="panel-body">
+                                    A simple video editor using the Java-based Processing framework created as the 
+                                    Final Project to our CSC690 Multimedia Applications class. Features include the 
+                                    ability to play multiple audio and video files, add effects along a timeline 
+                                    including audio clips and video effects, load and create subtitle files in SubRip 
+                                    Text (SRT) format, and the ability to import and export all of these to a custom 
+                                    project file.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="wingman.html" target="_blank">
+                                        <h3>Wingman</h3>                                        
+                                    </a>
+                                    <!--<img src="imgs/logo_Sparkpoint.png" alt="SparkpointLogo" width="280" height="72">-->
+                                </div>
+                                <div class="panel-body">
+                                    A 2D scrolling shooter made in Java for my CSC413 Software Development class.
+                                    Features 2 players that can play simultaneously, weapon and health powerups,
+                                    randomly selected enemy wave patterns and a boss fight.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <a href="tankgame.html" target="_blank">
+                                        <h3>Tankman</h3>
+                                    </a>
+                                    <!--<img src="imgs/logo_Sparkpoint.png" alt="SparkpointLogo" width="280" height="72">-->
+                                </div>
+                                <div class="panel-body">
+                                    A 2D split-screen multiplayer tank game made in Java for my CSC413 Software Development
+                                    class. Features 2 players, weapon powerups, and maps that can be loaded using txt or csv
+                                    files.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <hr class="col-md-12">
 
 
                     <h2 id="sec3">Other Links</h2>
                     <div style="float:left; display:inline-block;">
-                        <div style="float:left; margin-right: 10px;">
+                        <div style="float:left; margin-right: 15px;">
                             <a href="https://github.com/NetNGames" target="_blank">
                                 <img src="imgs/logo_GitHub.png" alt="Git" width="64" height="64">
                                 <div class="caption">
@@ -139,12 +216,20 @@
                             </a>
 
                         </div>
-                        <div style="float:left;">
+                        <div style="float:left; margin-right: 15px;">
                             <a href="https://www.linkedin.com/pub/elbert-dang/91/34b/873" target="_blank">
                                 <img src="imgs/logo_In.png" alt="Linked" width="64" height="64">
                                 <div class="caption">
                                     My LinkedIn
                                 </div>
+                            </a>
+                        </div>
+                        <div style="float:left; margin-right: 15px;">
+                            <a href="assets/Elbert Resume.pdf" target="_blank">
+                                <img src="imgs/PDFdl.gif" alt="AdobePDF" width="64" height="64">
+                                <div class="caption">
+                                    My Resume
+                                </div>                                
                             </a>
                         </div>
                     </div>
@@ -174,7 +259,6 @@
 
                 var $body = $(document.body);
                 var navHeight = $('.navbar').outerHeight(true) + 10;
-
                 $body.scrollspy({
                     target: '#leftCol',
                     offset: navHeight
